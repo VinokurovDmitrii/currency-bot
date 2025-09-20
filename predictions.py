@@ -1,11 +1,26 @@
 import os
 import random
+import logging
 from telegram import Bot
+from telegram.error import TelegramError
+
+logging.basicConfig(level=logging.INFO)
 
 TOKEN = os.getenv("BOT_TOKEN")
-CHAT_ID = int(os.getenv("CHAT_ID"))
+CHAT_ID_ENV = os.getenv("CHAT_ID")
+
+if not TOKEN or not CHAT_ID_ENV:
+    logging.error("Environment variables BOT_TOKEN or CHAT_ID are not set: BOT_TOKEN=%s CHAT_ID=%s", bool(TOKEN), CHAT_ID_ENV)
+    raise RuntimeError("BOT_TOKEN and CHAT_ID must be set in environment")
+
+try:
+    CHAT_ID = int(CHAT_ID_ENV)
+except (TypeError, ValueError):
+    # allow @channelusername or non-integer ids
+    CHAT_ID = CHAT_ID_ENV
 
 bot = Bot(token=TOKEN)
+
 predictions = [
     "Сегодня вас ожидает полный пиздец.",
     "Утро доброе, но не для вас, уебков.",
@@ -111,7 +126,17 @@ predictions = [
 
 def send_prediction():
     text = random.choice(predictions)
-    bot.send_message(chat_id=CHAT_ID, text=f"🔮 Предсказание на сегодня:\n{text}")
+    logging.info("Selected prediction: %s", text[:200])
+    try:
+        res = bot.send_message(chat_id=CHAT_ID, text=f"🔮 Предсказание на сегодня:\n{text}")
+        # log minimal info about the response so Actions shows it
+        logging.info("send_message succeeded: message_id=%s chat=%s", getattr(res, 'message_id', None), getattr(res, 'chat', None))
+    except TelegramError as e:
+        logging.exception("Telegram API error when sending message: %s", e)
+        raise
+    except Exception as e:
+        logging.exception("Unexpected error when sending message: %s", e)
+        raise
 
 if __name__ == "__main__":
     send_prediction()
