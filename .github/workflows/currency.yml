@@ -2,11 +2,11 @@ name: Currency Bot
 
 on:
   schedule:
-    - cron: "0 * * * *"
-  workflow_dispatch:
+    - cron: "0 * * * *"   # запуск каждый час
+  workflow_dispatch:       # можно запустить руками
 
 jobs:
-  send-currency:
+  update-message:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -18,10 +18,11 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install python-telegram-bot requests
+        run: pip install requests python-telegram-bot==13.15
 
       - name: Run bot
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: python currency.py
+          MESSAGE_ID: ${{ secrets.MESSAGE_ID }}
+        run: python bot.py
