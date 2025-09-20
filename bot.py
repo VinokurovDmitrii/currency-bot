@@ -3,6 +3,7 @@ import requests
 from telegram import Bot
 from telegram.error import BadRequest, TelegramError
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = int(os.getenv("CHAT_ID"))
@@ -32,7 +33,9 @@ def main():
     if usd is None or eur is None:
         return  # не продолжаем, если ошибка с курсами
 
-    now = datetime.now()
+    # get current time in Belgrade timezone
+    tz = ZoneInfo("Europe/Belgrade")
+    now = datetime.now(tz)
     day = now.day
     month = MONTHS_RU[now.month - 1]  # месяц по-русски
     hour = now.hour
