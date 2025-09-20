@@ -1,6 +1,7 @@
 import os
 import random
 import logging
+import asyncio
 from telegram import Bot
 from telegram.error import TelegramError
 
@@ -124,11 +125,11 @@ predictions = [
     "Радуйтесь мелочам. Большего вам не светит.",
 ]
 
-def send_prediction():
+async def send_prediction():
     text = random.choice(predictions)
     logging.info("Selected prediction: %s", text[:200])
     try:
-        res = bot.send_message(chat_id=CHAT_ID, text=f"🔮 Предсказание на сегодня:\n{text}")
+        res = await bot.send_message(chat_id=CHAT_ID, text=f"🔮 Предсказание на сегодня:\n{text}")
         # log minimal info about the response so Actions shows it
         logging.info("send_message succeeded: message_id=%s chat=%s", getattr(res, 'message_id', None), getattr(res, 'chat', None))
     except TelegramError as e:
@@ -139,4 +140,5 @@ def send_prediction():
         raise
 
 if __name__ == "__main__":
-    send_prediction()
+    # python-telegram-bot v20+ uses async methods — run the coroutine
+    asyncio.run(send_prediction())
