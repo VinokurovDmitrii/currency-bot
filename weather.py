@@ -56,13 +56,22 @@ async def fetch_weather():
         "latitude": LAT,
         "longitude": LON,
         "current_weather": True,
-        "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode,time",
+        # 'time' is not a valid daily field name for Open-Meteo daily param; remove it
+        "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode",
         "timezone": TZ,
     }
     try:
         # run blocking requests.get in a thread
         resp = await asyncio.to_thread(requests.get, url, params=params, timeout=10)
-        resp.raise_for_status()
+        try:
+            resp.raise_for_status()
+        except Exception:
+            # log response content for easier debugging
+            try:
+                logging.error("Open-Meteo response (%s): %s", resp.status_code, resp.text)
+            except Exception:
+                logging.exception("Failed to read response body")
+            raise
         return resp.json()
     except Exception as e:
         logging.exception("Error fetching weather: %s", e)
