@@ -128,37 +128,6 @@ predictions = [
 async def send_prediction():
     text = random.choice(predictions)
     logging.info("Selected prediction: %s", text[:200])
-    # 30% chance to soften the prediction (replace harsh words with milder variants)
-    try:
-        if random.random() < 0.3:
-            mapping = {
-                "пиздец": "неудача",
-                "уебков": "некоторых людей",
-                "хуй": "проблему",
-                "нахуй": "отстаньте",
-                "хуёвым": "сложным",
-                "ни хуя": "ничего",
-                "долбоёбы": "ошибки",
-                "говно": "неприятность",
-                "хуёвый": "неприятный",
-                "проёбы": "ошибки",
-                "заебались": "устали",
-                "нахуй пошлёт": "откажет",
-                "ебало": "лицо",
-                "по пизде": "напряжённо",
-                "проебёте": "упустите",
-                "проёбов": "провалов",
-                "охуенный": "интересный",
-                "хуёво": "плохо",
-            }
-            softened = text
-            for bad, good in mapping.items():
-                softened = softened.replace(bad, good)
-            if softened != text:
-                logging.info("Softened prediction: %s", softened[:200])
-                text = softened
-    except Exception:
-        logging.exception("Error during softening step")
     try:
         res = await bot.send_message(chat_id=CHAT_ID, text=f"🔮 Предсказание на сегодня:\n{text}")
         # log minimal info about the response so Actions shows it
