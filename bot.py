@@ -42,7 +42,7 @@ def main():
     minute = now.minute
 
     text = (
-        "🇪🇺 EUR: {eur:.2f} ₽\n"
+        f"🇪🇺 EUR: {eur:.2f} ₽\n"
         f"🇺🇸 USD: {usd:.2f} ₽\n\n"
         f"🕒 Актуально на {day} {month} {hour:02d}:{minute:02d}"
     )
